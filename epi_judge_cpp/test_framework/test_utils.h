@@ -90,7 +90,7 @@ decltype(auto) ParseSerializedArgsImpl(
 std::string GetDefaultTestDataDirPath() {
   static constexpr int kMaxSearchDepth = 4;
 
-  std::string path = "test_data";
+  std::string path = "/Users/adam/Documents/projects/my_cs_degree/EPIJudge/test_data";
   for (int i = 0; i < kMaxSearchDepth; i++) {
     if (platform::IsDir(path.c_str())) {
       return path;
