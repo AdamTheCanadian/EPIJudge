@@ -8,35 +8,29 @@ using std::vector;
 enum class Color { kRed, kWhite, kBlue };
 
 void DutchFlagPartition(int pivot_index, vector<Color>* A_ptr) {
-  std::vector<Color> less, equal, greater;
-  const auto& pivot_value = A_ptr->at(pivot_index);
-  for (int i = 0; i < A_ptr->size(); i++) {
-    if (A_ptr->at(i) == pivot_value) {
-      equal.push_back(A_ptr->at(i));
+  vector<Color>& A = *A_ptr;
+  Color pivot = A[pivot_index];
+  /**
+   * Keep the following invariants during partitioning:
+   * bottom group: A[0, smaller - 1].
+   * middle group: A[smaller, equal - 1].
+   * unclassified group: A[equal, larger - 1].
+   * top group: A[larger, size(A) - 1].
+   */
+  int smaller = 0, equal = 0, larger = A.size();
+  // Keep iterating as long as there is an unclassified element.
+  while (equal < larger) {
+    // A[equal] is the incoming unclassified element.
+    if (A[equal] < pivot) {
+      std::swap(A[smaller++], A[equal++]);
+    } else if (A[equal] == pivot) {
+      ++equal;
+    } else {  // A[equal] > pivot.
+      std::swap(A[equal], A[--larger]);
     }
-    else if (A_ptr->at(i) > pivot_value) {
-      greater.push_back(A_ptr->at(i));
-    }
-    else {
-      less.push_back(A_ptr->at(i));
-    }
   }
-  // Combine the vectors
-  int index = 0;
-  for (auto& s : less) {
-    A_ptr->at(index) = s;
-    index += 1;
-  }
-  for (auto& s : equal) {
-    A_ptr->at(index) = s;
-    index += 1;
-  }
-  for (auto& s : greater) {
-    A_ptr->at(index) = s;
-    index += 1;
-  }
-  return;
 }
+
 void DutchFlagPartitionWrapper(TimedExecutor& executor, const vector<int>& A,
                                int pivot_idx) {
   vector<Color> colors;
@@ -81,3 +75,73 @@ int main(int argc, char* argv[]) {
                          "dutch_national_flag.tsv", &DutchFlagPartitionWrapper,
                          DefaultComparator{}, param_names);
 }
+
+/* Crude implementation 1 that creates three vectors for 
+  less than, equal to, or greater than the pivot. Then combines
+  the vectors at the end
+
+std::vector<Color> less, equal, greater;
+  const auto& pivot_value = A_ptr->at(pivot_index);
+  for (int i = 0; i < A_ptr->size(); i++) {
+    if (A_ptr->at(i) == pivot_value) {
+      equal.push_back(A_ptr->at(i));
+    }
+    else if (A_ptr->at(i) > pivot_value) {
+      greater.push_back(A_ptr->at(i));
+    }
+    else {
+      less.push_back(A_ptr->at(i));
+    }
+  }
+  // Combine the vectors
+  int index = 0;
+  for (auto& s : less) {
+    A_ptr->at(index) = s;
+    index += 1;
+  }
+  for (auto& s : equal) {
+    A_ptr->at(index) = s;
+    index += 1;
+  }
+  for (auto& s : greater) {
+    A_ptr->at(index) = s;
+    index += 1;
+  }
+
+*/
+
+/* Crude implementation 2, not working
+
+std::vector<Color> less, equal, greater;
+  const auto& pivot_value = A_ptr->at(pivot_index);
+  std::cout << std::endl;
+  std::cout << "Pivot value is " << (int)pivot_value << std::endl;
+  // Iterate through the array placing all values smaller than the pivot
+  // at the front
+  int smaller_index = 0;
+  for (int i = 0; i < A_ptr->size(); i++) {
+    if (A_ptr->at(i) < pivot_value) {
+      std::cout << "Smaller was: " << smaller_index << " i is " << i << std::endl;
+      std::swap(A_ptr->at(i), A_ptr->at(smaller_index++));
+      for (int j = 0; j < A_ptr->size(); j++) {
+        std::cout << (int)A_ptr->at(j) << " ";
+      }
+      std::cout << std::endl;
+      std::cout << "Smaller is now " << smaller_index << std::endl;
+    }
+  }
+
+  int larger_index = A_ptr->size() - 1;
+  for (int i = A_ptr->size() - 1; i >= 0; i--) {
+    if (A_ptr->at(i) > pivot_value) {
+      std::swap(A_ptr->at(i), A_ptr->at(larger_index--));
+      std::cout << "Larger is now " << larger_index << std::endl;
+    }
+  }
+  for (int i = 0; i < A_ptr->size(); i++) {
+    std::cout << (int)A_ptr->at(i) << " ";
+  }
+  std::cout << std::endl;
+  return;
+
+  */
