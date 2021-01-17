@@ -8,25 +8,18 @@ using std::vector;
 enum class Color { kRed, kWhite, kBlue };
 
 void DutchFlagPartition(int pivot_index, vector<Color>* A_ptr) {
-  vector<Color>& A = *A_ptr;
+  vector<Color>&A = *A_ptr;
   Color pivot = A[pivot_index];
-  /**
-   * Keep the following invariants during partitioning:
-   * bottom group: A[0, smaller - 1].
-   * middle group: A[smaller, equal - 1].
-   * unclassified group: A[equal, larger - 1].
-   * top group: A[larger, size(A) - 1].
-   */
-  int smaller = 0, equal = 0, larger = A.size();
-  // Keep iterating as long as there is an unclassified element.
-  while (equal < larger) {
-    // A[equal] is the incoming unclassified element.
-    if (A[equal] < pivot) {
-      std::swap(A[smaller++], A[equal++]);
-    } else if (A[equal] == pivot) {
-      ++equal;
-    } else {  // A[equal] > pivot.
-      std::swap(A[equal], A[--larger]);
+  int smaller = 0;
+  for (int i = 0; i < A.size(); ++i) {
+    if (A[i] < pivot) {
+      std::swap(A[i], A[smaller++]);
+    }
+  }
+  int larger = A.size() - 1;
+  for (int i = A.size() - 1; i >= 0; --i) {
+    if (A[i] > pivot) {
+      std::swap(A[i], A[larger--]);
     }
   }
 }
