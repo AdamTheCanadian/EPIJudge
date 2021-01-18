@@ -4,17 +4,20 @@
 using std::vector;
 double BuyAndSellStockOnce(const vector<double>& prices) {
   
-  int current_low_index = 0;
-  double current_best_diff = 0.0;
+  int min_index = 0;
+  double min_price = 1.0e6;
+  double max_profit = 0.0;
   for (int i = 0; i < prices.size(); i++) {
-    for (int j = i + 1; j < prices.size(); j++) {
-      double diff = prices[j] - prices[i];
-      if (diff > current_best_diff) {
-        current_best_diff = diff;
-      }
+    double diff_today = prices[i] - min_price;
+    if (diff_today > max_profit) {
+      max_profit = diff_today;
+    }
+    // Do we have a new minimum found, if so update
+    if (prices[i] < min_price) {
+      min_price = prices[i];
     }
   }
-  return current_best_diff;
+  return max_profit;
 }
 
 int main(int argc, char* argv[]) {
