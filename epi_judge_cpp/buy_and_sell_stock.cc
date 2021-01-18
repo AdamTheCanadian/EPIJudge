@@ -3,8 +3,18 @@
 #include "test_framework/generic_test.h"
 using std::vector;
 double BuyAndSellStockOnce(const vector<double>& prices) {
-  // TODO - you fill in here.
-  return 0.0;
+  
+  int current_low_index = 0;
+  double current_best_diff = 0.0;
+  for (int i = 0; i < prices.size(); i++) {
+    for (int j = i + 1; j < prices.size(); j++) {
+      double diff = prices[j] - prices[i];
+      if (diff > current_best_diff) {
+        current_best_diff = diff;
+      }
+    }
+  }
+  return current_best_diff;
 }
 
 int main(int argc, char* argv[]) {
